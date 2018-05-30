@@ -15,7 +15,7 @@ As a cosmic squid with an elegant spaceship, shoot octopuses up!
 
 # Controls
 
-- `UP` `DOWN` `LEFT` `RIGHT`: move the squid
+- `UP` `DOWN` `LEFT` `RIGHT`: move the ship
 - `A` or `B`: fire
 
 # LICENSE
