@@ -18,6 +18,7 @@ As a cosmic squid with an elegant spaceship, shoot octopuses up!
 # LICENSE
 
 Copyright (C) 2017, cubic9com All rights reserved for the original version.
+
 Copyright (C) 2018, geed All rights reserved.
 
 This code is licensed under the BSD 3-Clause license.
