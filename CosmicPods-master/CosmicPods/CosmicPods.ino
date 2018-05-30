@@ -146,6 +146,19 @@ const uint8_t cosmic_shipData[] = {
 };
 Image cosmic_ship(cosmic_shipData);
 
+const Gamebuino_Meta::Sound_FX sfx_shoot[] = {
+  {Gamebuino_Meta::Sound_FX_Wave::SQUARE,0,255,-15,25,24,8},
+};
+
+const Gamebuino_Meta::Sound_FX sfx_explosion[] = {
+  {Gamebuino_Meta::Sound_FX_Wave::SQUARE,1,180,25,35,100,2},
+  {Gamebuino_Meta::Sound_FX_Wave::NOISE,1,200,0,19,112,9},
+  {Gamebuino_Meta::Sound_FX_Wave::NOISE,0,90,0,20,0,16},
+};
+
+const Gamebuino_Meta::Sound_FX sfx_blop[] = {
+  {Gamebuino_Meta::Sound_FX_Wave::SQUARE,0,255,30,30,100,13},
+};
 
 void setup() {
   
@@ -369,6 +382,7 @@ void movePlayer() {
     for (byte i = 0; i < NUM_PLAYER_BULLETS; i++) {
       if (!player.bullets[i].enabled) {
         spawnPlayerBullet(i);
+        gb.sound.fx(sfx_shoot);
         break;
       }
     }
@@ -398,6 +412,7 @@ void moveEnemies() {
       && (random(0, 50) == 10)
     ) {
       spawnEnemyBullet(i);
+      gb.sound.fx(sfx_blop);
     }
 
     if (enemies[i].rect.x <= 0) {
@@ -471,10 +486,13 @@ void checkEnemyCollision() {
       gb.display.fillCircle(enemies[j].rect.x + 3, enemies[j].rect.y + 6, 6);
       gb.display.setColor(random(8,11));
       gb.display.fillCircle(enemies[j].rect.x + 7, enemies[j].rect.y + 2, 3);
+      gb.lights.drawPixel(0, 1, RED);
+      gb.lights.drawPixel(1, 1, RED);
       gb.lights.drawPixel(0, 2, ORANGE);
       gb.lights.drawPixel(1, 2, ORANGE);
       gb.lights.drawPixel(0, 3, YELLOW);
       gb.lights.drawPixel(1, 3, YELLOW);
+      gb.sound.fx(sfx_explosion);
       spawnEnemy(j);
     }
   }
