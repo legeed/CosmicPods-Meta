@@ -1,6 +1,9 @@
 # CosmicPods-Meta
+
 Port of CosmicPods on Gamebuino Meta
+
 CosmicPods is a tiny shoot-'em-up game for [Arduboy](https://arduboy.com/).
+
 It have been colorized and ported on [GB-Meta](https://gamebuino.com).
 
 Original game by cubic9com
