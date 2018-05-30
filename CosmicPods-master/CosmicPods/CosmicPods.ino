@@ -12,8 +12,8 @@
 
 #include <Gamebuino-Meta.h>
 
-#define CHAR_WIDTH 6
-#define CHAR_HEIGHT 8
+#define CHAR_WIDTH 3
+#define CHAR_HEIGHT 5
 
 #define X_MAX (WIDTH - (CHAR_WIDTH * 3) + 1)
 #define Y_MAX (HEIGHT - CHAR_HEIGHT)
@@ -26,16 +26,14 @@
 #define PLAYER_RECT {0, 1, 16, 6}
 uint8_t STAR_COLORS [] = {1, 6, 7, 12, 13};
 
-struct Rect
-{
+struct Rect {
   int16_t x;      
   int16_t y;      
   uint8_t w;      
   uint8_t h;      
 };
 
-struct Point
-{
+struct Point {
   int16_t x;      
   int16_t y;      
 };
@@ -84,7 +82,10 @@ struct Enemy enemies[MAX_NUM_ENEMIES];
 boolean last_a_button_val;
 boolean last_b_button_val;
 boolean is_gameover;
+boolean is_title;
 unsigned int score;
+unsigned int best_score;
+boolean is_highscore;
 byte num_enemies;
 byte bullet_speed_factor;
 byte level;
@@ -150,9 +151,10 @@ void setup() {
   
   gb.begin();
 
+  best_score = gb.save.get(0);
+
   WIDTH = gb.display.width();
   HEIGHT = gb.display.height();
-  
 
   for (byte i = 0; i < MAX_NUM_ENEMIES; i++) {
     enemies[i].rect = ENEMY_RECT;
@@ -163,16 +165,29 @@ void setup() {
 }
 
 void loop() {
-   while(!gb.update());
+  while(!gb.update());
 
+  gb.display.clear();
+  gb.lights.clear();
+
+  if (is_title) {
+    moveStars();
+    drawStars();
+    displayTitle();
+    if (gb.buttons.pressed(BUTTON_A) || gb.buttons.pressed(BUTTON_B)) {
+      beginGame();
+      is_title = false;
+    }
+    return;
+  }
+  
   if (is_gameover) {
+    displayGameover();
     if (gb.buttons.pressed(BUTTON_A) || gb.buttons.pressed(BUTTON_B)) {
       beginGame();
     }
     return;
   }
-
-  gb.display.clear();
 
   movePlayer();
   moveStars();
@@ -194,8 +209,6 @@ void loop() {
 
 void beginGame() {
   initialize();
-
-  displayTitle();
 }
 
 void initialize() {
@@ -226,6 +239,8 @@ void initialize() {
   }
 
   is_gameover = false;
+  is_title = true;
+  is_highscore = false;
 
   shiftLevel();
 }
@@ -286,13 +301,6 @@ void setLevel(byte lv, byte ne, float spd) {
   level = lv;
   num_enemies = ne;
   bullet_speed_factor = spd;
-}
-
-void displayTitle() {
-  gb.display.clear();
-  gb.display.setCursor((WIDTH / 2) - (CHAR_WIDTH * 9 / 2), (HEIGHT / 2) - (CHAR_HEIGHT / 2));
-  gb.display.println("CosmicPods");
-  delay(1600);
 }
 
 void spawnEnemy(byte i) {
@@ -463,6 +471,10 @@ void checkEnemyCollision() {
       gb.display.fillCircle(enemies[j].rect.x + 3, enemies[j].rect.y + 6, 6);
       gb.display.setColor(random(8,11));
       gb.display.fillCircle(enemies[j].rect.x + 7, enemies[j].rect.y + 2, 3);
+      gb.lights.drawPixel(0, 2, ORANGE);
+      gb.lights.drawPixel(1, 2, ORANGE);
+      gb.lights.drawPixel(0, 3, YELLOW);
+      gb.lights.drawPixel(1, 3, YELLOW);
       spawnEnemy(j);
     }
   }
@@ -476,6 +488,13 @@ void checkPlayerCollision() {
     boolean is_enemy_col = collideRectRect(enemies[i].rect, player.rect);
     boolean is_bullet_col = (enemies[i].bullet.enabled) && (collidePointRect(tmp_point, player.rect));
     if ((is_enemy_col) || (is_bullet_col)) {
+      if (score > best_score) { 
+        gb.save.set(0, score);
+        best_score = score;
+        is_highscore = true;
+        } else {
+          is_highscore = false;
+        }
       displayGameover();
       return;
     }
@@ -483,10 +502,31 @@ void checkPlayerCollision() {
 }
 
 void displayGameover() {
+  for (byte i = 0; i <= 3; i++) {
+    gb.lights.drawPixel(0, i, RED);
+    gb.lights.drawPixel(1, i, RED);
+  }
+  drawScore();
   gb.display.setColor(WHITE);
-  gb.display.setCursor((WIDTH / 2) - (CHAR_WIDTH * 9 / 2), (HEIGHT / 2) - (CHAR_HEIGHT / 2));
+  gb.display.setCursor((WIDTH / 2) - (CHAR_WIDTH * 12 / 2), (HEIGHT / 2) - (CHAR_HEIGHT / 2));
   gb.display.print("GAME OVER");
+  if (is_highscore) {
+     gb.display.setColor(RED);
+     gb.display.setCursor((WIDTH / 2) - (CHAR_WIDTH * 18 / 2), (HEIGHT / 2) - (CHAR_HEIGHT / 2) + (CHAR_HEIGHT + 1));
+     gb.display.print("NEW HIGH SCORE");
+  }
   is_gameover = true;
+}
+
+void displayTitle() {
+  gb.display.setColor(WHITE);
+  gb.display.setCursor((WIDTH / 2) - (CHAR_WIDTH * 14 / 2), (HEIGHT / 2) - (CHAR_HEIGHT / 2) - (CHAR_HEIGHT + 1) );
+  gb.display.println("Cosmic Pods");
+  gb.display.println("                  ");
+  gb.display.print("   Highscore : ");
+  gb.display.println(best_score);
+  gb.display.drawImage(10, 12, cosmic_ship);
+  gb.display.drawImage(64, 45, cosmic_pod);
 }
 
 void drawScore() {
