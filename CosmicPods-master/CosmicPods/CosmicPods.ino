@@ -704,7 +704,9 @@ void drawEnemiesBullet() {
       x = enemies[i].bullet.point.x;
       y = enemies[i].bullet.point.y;
       gb.display.setColor(PINK);
-      gb.display.drawCircle(x, y, 2);
+      gb.display.fillCircle(x, y, 2);
+      gb.display.setColor(WHITE);
+      gb.display.drawCircle(x, y, 1);
     }
   }
 }
