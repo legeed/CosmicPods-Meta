@@ -11,12 +11,12 @@ https://github.com/ArduboyCollection/CosmicPods
 
 # Overview
 
-As a cosmic squid with an elegant spaceship, shoot octopuses up!
+As a cosmic squid, shoot octopuses up!
 
 # Controls
 
-- `UP` `DOWN` `LEFT` `RIGHT`: move the ship
-- `A` or `B`: fire
+- `UP` `DOWN` `LEFT` `RIGHT` : move the ship
+- `A` or `B` : fire
 
 # LICENSE
 
